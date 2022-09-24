@@ -9,5 +9,5 @@
 
 
 netFun <- function(x, ...) {
-  stats::cor(t(x), method="pearson") 
+  stats::cor(t(x), method = "spearman")
 }
