@@ -1,3 +1,44 @@
+# install R and required libraries https://cloud.r-project.org/bin/linux/ubuntu/ ([script](installDeps.sh))
+## sudo vim /etc/apt/sources.list and remove cran-* lines
+
+```
+sudo apt update -y -qq
+sudo apt install -y --no-install-recommends software-properties-common dirmngr gfortran liblapack-dev libopenblas-dev
+# add the signing key (by Michael Rutter) for these repos
+# To verify key, run gpg --show-keys /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+# Fingerprint: E298A3A825C0D65DFD57CBB651716619E084DAB9
+wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+# add the R 4.0 repo from CRAN -- adjust 'focal' to 'groovy' or 'bionic' as needed
+sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+sudo apt -y update
+sudo apt -y upgrade
+sudo apt install -y --no-install-recommends r-base
+```
+
+# install required packages-R https://cloud.r-project.org/bin/linux/ubuntu/ ([script](installPkgs.r))
+```
+dirLocal <- getwd()
+dir.create(file.path(dirLocal, "rLib"), showWarnings = FALSE)
+libLocal <- paste(dirLocal,"rLib",sep="/")
+reposLib="http://cran.us.r-project.org"
+install.packages(c("infotheo","BiocManager","jsonlite"), lib = libLocal, repos = reposLib)
+BiocManager::install(c("BiocGenerics","GenomeInfoDb","Biobase","S4Vectors","IRanges", "GenomicRanges","MatrixGenerics", "matrixStats", "SummarizedExperiment","reshape2","limma","lionessR","igraph"),  lib = libLocal)
+```
+
+# download Myeloma-data [CoMMpass](https://themmrf.org/finding-a-cure/our-work/the-mmrf-commpass-study/) parsed with package [MMRFBiolinks](https://pubmed.ncbi.nlm.nih.gov/33821961/) and unzip into a csv file (caveat https://github.com/marziasettino/MMRFBiolinks/issues/5) ([script](downloadData.sh))
+```
+wget https://github.com/animesh/MMRFBiolinks/raw/master/plotKM/dataGE.zip
+unzip dataGE.zip
+```
+
+# check complete pipeline with above data ([script](pipeline.sh))
+```
+bash installDeps.sh 
+Rscript installPkgs.r
+bash downloadData.sh 
+Rscript checkMM.r 
+```
+
 # lionessR
 ## An R package for single sample network reconstruction
 
