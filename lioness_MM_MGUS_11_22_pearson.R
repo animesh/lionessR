@@ -137,7 +137,7 @@ fit <- lmFit(CC, design)
 fit2 <- contrasts.fit(fit, cont.matrix)
 fit2e <- eBayes(fit2)
 toptable <- topTable(fit2e, number=nrow(CC), adjust.method="fdr")
-head(toptable,10)
+head(toptable,100)
 hist(toptable$logFC)
 hist(toptable$P.Value)
 hist(toptable$adj.P.Val)
@@ -220,9 +220,22 @@ fit <- lmFit(M, design)
 fit2 <- contrasts.fit(fit, cont.matrix)
 fit2e <- eBayes(fit2)
 topDE <- topTable(fit2e, number=nrow(M), adjust="fdr")
+
+#write.table(sorted_topDE, sep = "\t")
+
 hist(topDE$logFC)
 topDE <- topDE[which(row.names(topDE) %in% topgeneslist),]
 topgenesDE <- cbind(row.names(topDE), topDE$t)
+
+## sort the gene list based on adj. p value
+sorted_topDE <- topDE[order(topDE$adj.P.Val),]
+
+## remove the lablleing of gene after dot--
+
+filterGeneNames <- gsub("\\..*","",rownames(sorted_topDE))
+#save the list 
+d<-lapply(filterGeneNames, write, file="filterGeneNames.txt", append=T);
+
 
 ##----------------------------------------------------------------------
 
